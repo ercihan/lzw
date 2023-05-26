@@ -38,6 +38,7 @@
 #include "lzw.h"
 #include "lzwlocal.h"
 #include "bitfile/bitfile.h"
+#include "..\fileToBinaryConvert.h"
 
 /***************************************************************************
 *                            TYPE DEFINITIONS
@@ -87,7 +88,7 @@ static int GetCodeWord(bit_file_t *bfpIn, const unsigned char codeLen);
 *   Returned   : 0 for success, -1 for failure.  errno will be set in the
 *                event of a failure.
 ***************************************************************************/
-int LZWDecodeFile(FILE *fpIn, FILE *fpOut)
+int LZWDecodeFile(FILE *fpIn, FILE *fpOut)//ToDo: No filpointer in is needed just the array
 {
     bit_file_t *bfpIn;                  /* encoded input */
 

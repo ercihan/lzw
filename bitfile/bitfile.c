@@ -101,6 +101,8 @@ typedef union
                                                         unsigned long */
 } endian_test_t;
 
+extern struct data_as_ints output_data;
+
 /***************************************************************************
 *                               PROTOTYPES
 ***************************************************************************/
@@ -202,6 +204,12 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
     }
 
     return (bf);
+}
+
+void store_output_data(char c){
+    output_data.data[1] = c;//[output_data.number_of_ints
+    output_data.number_of_ints += 1;
+    printf("In store_output_data: %c\n", output_data.data[output_data.number_of_ints-1]);
 }
 
 /**
@@ -348,6 +356,8 @@ int BitFileClose(bit_file_t *stream)
         if (stream->bitCount != 0)
         {
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
+            printf("In BitFileClose: %x\n", stream->bitBuffer);
+            store_output_data(stream->bitBuffer);
             fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
@@ -394,6 +404,8 @@ FILE *BitFileToFILE(bit_file_t *stream)
         if (stream->bitCount != 0)
         {
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
+            printf("In BitFileToFILE: %x\n", stream->bitBuffer);
+            store_output_data(stream->bitBuffer);
             fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
@@ -447,6 +459,8 @@ int BitFileByteAlign(bit_file_t *stream)
         if (stream->bitCount != 0)
         {
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
+            printf("In BitFileByteAlign: %x\n", stream->bitBuffer);
+            store_output_data(stream->bitBuffer);
             fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
@@ -498,6 +512,8 @@ int BitFileFlushOutput(bit_file_t *stream, const unsigned char onesFill)
             stream->bitBuffer |= (0xFF >> stream->bitCount);
         }
 
+        printf("In BitFileFlushOutput: %x\n", stream->bitBuffer);
+        store_output_data(stream->bitBuffer);
         returnValue = fputc(stream->bitBuffer, stream->fp);
     }
 
@@ -575,8 +591,11 @@ int BitFileGetChar(bit_file_t *stream)
  */
 int BitFilePutChar(const int c, bit_file_t *stream)
 {
+    //printf("In BitfilePutChar: %x\n", c);
     unsigned char tmp;
-
+    // output_data.data[output_data.number_of_ints] = c;
+    // output_data.number_of_ints += 1;
+    // printf("In BitfilePutChar: %c\n", output_data.data[output_data.number_of_ints-1]);
     if (stream == NULL)
     {
         return(EOF);
@@ -585,13 +604,16 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     if (stream->bitCount == 0)
     {
         /* we can just put byte from file */
+        printf("In BitfilePutChar in if: %x\n", c);
+        store_output_data(stream->bitBuffer);
         return fputc(c, stream->fp);
     }
 
     /* figure out what to write */
     tmp = ((unsigned char)c) >> (stream->bitCount);
     tmp = tmp | ((stream->bitBuffer) << (8 - stream->bitCount));
-
+    printf("In BitfilePutChar: %x\n", tmp);
+    store_output_data(tmp);
     if (fputc(tmp, stream->fp) != EOF)
     {
         /* put remaining in buffer. count shouldn't change. */
@@ -603,6 +625,12 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     }
 
     return tmp;
+}
+
+int forwardTheCharVal(const int c)
+{
+    printf("In BitfilePutChar: %c\n", c);
+    return c;
 }
 
 /**
@@ -689,6 +717,8 @@ int BitFilePutBit(const int c, bit_file_t *stream)
     /* write bit buffer if we have 8 bits */
     if (stream->bitCount == 8)
     {
+        printf("In BitFilePutBit: %x\n", stream->bitBuffer);
+        store_output_data(stream->bitBuffer);
         if (fputc(stream->bitBuffer, stream->fp) == EOF)
         {
             returnValue = EOF;
