@@ -68,7 +68,7 @@
 *                             INCLUDED FILES
 ***************************************************************************/
 #include <stdio.h>
-#include "..\..\fileToBinaryConvert.h"
+#include "../../fileToBinaryConvert.h"
 
 /***************************************************************************
 *                            TYPE DEFINITIONS

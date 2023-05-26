@@ -38,7 +38,7 @@
 #include "lzw.h"
 #include "lzwlocal.h"
 #include "bitfile/bitfile.h"
-#include "..\fileToBinaryConvert.h"
+#include "../fileToBinaryConvert.h"
 
 /***************************************************************************
 *                            TYPE DEFINITIONS

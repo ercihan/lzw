@@ -32,7 +32,7 @@
 
 #ifndef _LZW_H_
 #define _LZW_H_
-#include "..\fileToBinaryConvert.h"
+#include "../fileToBinaryConvert.h"
 
 /***************************************************************************
 *                                CONSTANTS

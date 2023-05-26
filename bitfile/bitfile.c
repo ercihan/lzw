@@ -207,9 +207,9 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
 }
 
 void store_output_data(char c){
-    output_data.data[1] = c;//[output_data.number_of_ints
+    output_data.data[output_data.number_of_ints] = c;
     output_data.number_of_ints += 1;
-    printf("In store_output_data: %c\n", output_data.data[output_data.number_of_ints-1]);
+    //printf("In store_output_data: %c\n", output_data.data[output_data.number_of_ints-1]);
 }
 
 /**
@@ -605,7 +605,7 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     {
         /* we can just put byte from file */
         printf("In BitfilePutChar in if: %x\n", c);
-        store_output_data(stream->bitBuffer);
+        store_output_data(c);
         return fputc(c, stream->fp);
     }
 
