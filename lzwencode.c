@@ -119,7 +119,7 @@ int LZWEncodeFile(FILE *fpIn, FILE *fpOut)
     dict_node_t *dictRoot;              /* root of dictionary tree */
     dict_node_t *node;                  /* node of dictionary tree */
 
-    output_data.data = calloc(1024, sizeof(char));
+    output_data.data = calloc(1024, sizeof(unsigned char));
 
     /* validate arguments */
     if ((NULL == fpIn) || (NULL == fpOut))

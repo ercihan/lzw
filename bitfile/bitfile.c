@@ -209,7 +209,6 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
 void store_output_data(char c){
     output_data.data[output_data.number_of_ints] = c;
     output_data.number_of_ints += 1;
-    //printf("In store_output_data: %c\n", output_data.data[output_data.number_of_ints-1]);
 }
 
 /**
@@ -548,27 +547,32 @@ int BitFileGetChar(bit_file_t *stream)
         return(EOF);
     }
 
-    returnValue = fgetc(stream->fp);
-
-    if (stream->bitCount == 0)
-    {
-        /* we can just get byte from file */
-        return returnValue;
+    //returnValue = fgetc(stream->fp);
+    returnValue = output_data.data[output_data.current_position];
+    if(output_data.number_of_ints > output_data.current_position){
+        printf("%x",returnValue);//BitFileGetChar
     }
+    output_data.current_position++;
+    // if (stream->bitCount == 0)
+    // {
+    //     //printf("BitFileGetChar if %x\n",returnValue);
+    //     /* we can just get byte from file */
+    //     return returnValue;
+    // }
 
-    /* we have some buffered bits to return too */
-    if (returnValue != EOF)
-    {
-        /* figure out what to return */
-        tmp = ((unsigned char)returnValue) >> (stream->bitCount);
-        tmp |= ((stream->bitBuffer) << (8 - (stream->bitCount)));
+    // /* we have some buffered bits to return too */
+    // if (returnValue != EOF)
+    // {
+    //     /* figure out what to return */
+    //     tmp = ((unsigned char)returnValue) >> (stream->bitCount);
+    //     tmp |= ((stream->bitBuffer) << (8 - (stream->bitCount)));
 
-        /* put remaining in buffer. count shouldn't change. */
-        stream->bitBuffer = returnValue;
+    //     /* put remaining in buffer. count shouldn't change. */
+    //     stream->bitBuffer = returnValue;
 
-        returnValue = tmp;
-    }
-
+    //     returnValue = tmp;
+    // }
+    //printf("BitFileGetChar 2if %x\n",returnValue);
     return returnValue;
 }
 
