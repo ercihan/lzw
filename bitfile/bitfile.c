@@ -207,7 +207,6 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
 }
 
 void store_output_data(char c){
-
     output_data.data[output_data.number_of_ints] = c;
     output_data.number_of_ints += 1;
 }
@@ -596,8 +595,11 @@ int BitFileGetChar(bit_file_t *stream)
  */
 int BitFilePutChar(const int c, bit_file_t *stream)
 {
+    //printf("In BitfilePutChar: %x\n", c);
     unsigned char tmp;
-
+    // output_data.data[output_data.number_of_ints] = c;
+    // output_data.number_of_ints += 1;
+    // printf("In BitfilePutChar: %c\n", output_data.data[output_data.number_of_ints-1]);
     if (stream == NULL)
     {
         return(EOF);
@@ -627,6 +629,12 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     }
 
     return tmp;
+}
+
+int forwardTheCharVal(const int c)
+{
+    printf("In BitfilePutChar: %c\n", c);
+    return c;
 }
 
 /**
