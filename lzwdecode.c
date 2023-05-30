@@ -234,6 +234,8 @@ static int GetCodeWord(bit_file_t *bfpIn, const unsigned char codeLen)
     int count;
 
     count = BitFileGetBitsNum(bfpIn, &code, codeLen, sizeof(code));
+    
+    //printf("GetCodeWord: decimal: %i, hex: %x, count: %i, codeLen:%x)\n",code,code,count, codeLen);
 
     if (count < codeLen)
     {
