@@ -46,7 +46,10 @@ int LZWEncodeFile(FILE *fpIn, FILE *fpOut);
 int LZWDecodeFile(FILE *fpIn, FILE *fpOut);
 
 typedef struct data_as_ints{
-    unsigned char * data;
+    union{
+        unsigned char * data_ascii;
+        int * data_binary;
+    }data;
     int number_of_ints;
     int current_position; 
 } data_as_ints;
