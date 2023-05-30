@@ -47,6 +47,7 @@
 ***************************************************************************/
 #include <stdlib.h>
 #include <errno.h>
+#include <math.h>
 #include "bitfile.h"
 
 /***************************************************************************
@@ -207,7 +208,7 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
 }
 
 void store_output_data(char c){
-    output_data.data[output_data.number_of_ints] = c;
+    output_data.data.data_ascii[output_data.number_of_ints] = c;
     output_data.number_of_ints += 1;
 }
 
@@ -547,32 +548,26 @@ int BitFileGetChar(bit_file_t *stream)
         return(EOF);
     }
 
-    //returnValue = fgetc(stream->fp);
-    returnValue = output_data.data[output_data.current_position];
-    if(output_data.number_of_ints > output_data.current_position){
-        printf("%x",returnValue);//BitFileGetChar
+    returnValue = fgetc(stream->fp);
+   
+    if (stream->bitCount == 0)
+    {
+        /* we can just get byte from file */
+        return returnValue;
     }
-    output_data.current_position++;
-    // if (stream->bitCount == 0)
-    // {
-    //     //printf("BitFileGetChar if %x\n",returnValue);
-    //     /* we can just get byte from file */
-    //     return returnValue;
-    // }
 
-    // /* we have some buffered bits to return too */
-    // if (returnValue != EOF)
-    // {
-    //     /* figure out what to return */
-    //     tmp = ((unsigned char)returnValue) >> (stream->bitCount);
-    //     tmp |= ((stream->bitBuffer) << (8 - (stream->bitCount)));
+    /* we have some buffered bits to return too */
+    if (returnValue != EOF)
+    {
+        /* figure out what to return */
+        tmp = ((unsigned char)returnValue) >> (stream->bitCount);
+        tmp |= ((stream->bitBuffer) << (8 - (stream->bitCount)));
 
-    //     /* put remaining in buffer. count shouldn't change. */
-    //     stream->bitBuffer = returnValue;
+        /* put remaining in buffer. count shouldn't change. */
+        stream->bitBuffer = returnValue;
 
-    //     returnValue = tmp;
-    // }
-    //printf("BitFileGetChar 2if %x\n",returnValue);
+        returnValue = tmp;
+    }
     return returnValue;
 }
 
@@ -935,6 +930,58 @@ int BitFilePutBits(bit_file_t *stream, void *bits, const unsigned int count)
     return (stream->GetBitsNumFunc)(stream, bits, count, size);
 }
 
+int binary_to_decimal(int number){
+  int decimal = 0;
+  int base = 0;
+  int remaining;
+
+  while (number!=0) {
+    remaining = number % 10;
+    number /= 10;
+    decimal += remaining * pow(2, base);
+    base++;
+  }
+
+  return decimal;
+}
+
+/**
+ * Get a char like BitFileGetChar() but from output_data instead of file.
+*/
+int fromArrayGetChar(){
+    
+    if (output_data.current_position+7 >= output_data.number_of_ints)
+    {
+        printf("Not enough bits left to read a char!\n");
+        return -1;
+    }
+    
+    int binary_number = 0;
+
+    //get 8 bits from output_data
+    for (int i = 0; i < 8; i++){
+        binary_number = 10 * binary_number + output_data.data.data_binary[output_data.current_position++];
+    }
+
+    return binary_to_decimal(binary_number);
+}
+
+/**
+ * Get a bit like BitFileGetBit() but from output_data instead of file.
+*/
+int fromArrayGetBit(){
+    
+    if (output_data.current_position >= output_data.number_of_ints)
+    {
+        printf("Not enough bits left to read a bit!\n");
+        return -1;
+    }
+   
+    return binary_to_decimal(output_data.data.data_binary[output_data.current_position++]);
+}
+
+
+
 /**
  * \fn static int BitFileGetBitsLE(bit_file_t *stream, void *bits,
  *  const unsigned int count, const size_t size)
@@ -975,8 +1022,9 @@ static int BitFileGetBitsLE(bit_file_t *stream, void *bits,
     /* read whole bytes */
     while (remaining >= 8)
     {
-        returnValue = BitFileGetChar(stream);
-
+        //returnValue = BitFileGetChar(stream);
+        returnValue = fromArrayGetChar();
+        printf("BitFileGetChar returnValue:%i\n",returnValue);
         if (returnValue == EOF)
         {
             return EOF;
@@ -992,8 +1040,9 @@ static int BitFileGetBitsLE(bit_file_t *stream, void *bits,
         /* read remaining bits */
         while (remaining > 0)
         {
-            returnValue = BitFileGetBit(stream);
-
+            //returnValue = BitFileGetBit(stream);
+            returnValue = fromArrayGetBit();
+            printf("BitFileGetBit returnValue:%i\n",returnValue);
             if (returnValue == EOF)
             {
                 return EOF;
@@ -1040,7 +1089,7 @@ static int BitFileGetBitsBE(bit_file_t *stream, void *bits,
 {
     unsigned char *bytes;
     int offset, remaining, returnValue;
-
+    printf("ERROR: ONLY LITTLE ENDIAN IS IMPLEMENTED!\n");
     if (count > (size * 8))
     {
         /* too many bits to read */
