@@ -358,7 +358,7 @@ int BitFileClose(bit_file_t *stream)
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
             printf("In BitFileClose: %x\n", stream->bitBuffer);
             store_output_data(stream->bitBuffer);
-            fputc(stream->bitBuffer, stream->fp);   /* handle error? */
+            // fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
 
@@ -408,7 +408,7 @@ FILE *BitFileToFILE(bit_file_t *stream)
             printf("In BitFileToFILE: %x\n", stream->bitBuffer);
             #endif
             store_output_data(stream->bitBuffer);
-            fputc(stream->bitBuffer, stream->fp);   /* handle error? */
+            // fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
 
@@ -463,7 +463,7 @@ int BitFileByteAlign(bit_file_t *stream)
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
             printf("In BitFileByteAlign: %x\n", stream->bitBuffer);
             store_output_data(stream->bitBuffer);
-            fputc(stream->bitBuffer, stream->fp);   /* handle error? */
+            // fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
     }
 
@@ -516,7 +516,7 @@ int BitFileFlushOutput(bit_file_t *stream, const unsigned char onesFill)
 
         printf("In BitFileFlushOutput: %x\n", stream->bitBuffer);
         store_output_data(stream->bitBuffer);
-        returnValue = fputc(stream->bitBuffer, stream->fp);
+        returnValue = stream->bitBuffer;//(stream->bitBuffer, stream->fp);
     }
 
     stream->bitBuffer = 0;
@@ -609,7 +609,8 @@ int BitFilePutChar(const int c, bit_file_t *stream)
         printf("In BitfilePutChar in if: %x\n", c);
         #endif
         store_output_data(c);
-        return fputc(c, stream->fp);
+        //return fputc(c, stream->fp);
+        return c;
     }
 
     /* figure out what to write */
@@ -618,8 +619,10 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     #ifdef DEBUG
     printf("In BitfilePutChar: %x\n", tmp);
     #endif
+    
     store_output_data(tmp);
-    if (fputc(tmp, stream->fp) != EOF)
+    //if (fputc(tmp, stream->fp) != EOF)
+    if(tmp != EOF)
     {
         /* put remaining in buffer. count shouldn't change. */
         stream->bitBuffer = c;
@@ -630,14 +633,6 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     }
 
     return tmp;
-}
-
-int forwardTheCharVal(const int c)
-{
-    #ifdef DEBUG
-    printf("In BitfilePutChar: %c\n", c);
-    #endif
-    return c;
 }
 
 /**
@@ -726,7 +721,8 @@ int BitFilePutBit(const int c, bit_file_t *stream)
     {
         printf("In BitFilePutBit: %x\n", stream->bitBuffer);
         store_output_data(stream->bitBuffer);
-        if (fputc(stream->bitBuffer, stream->fp) == EOF)
+        // if (fputc(stream->bitBuffer, stream->fp) == EOF)
+        if(stream->bitBuffer == EOF)
         {
             returnValue = EOF;
         }
