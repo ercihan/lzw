@@ -404,7 +404,9 @@ FILE *BitFileToFILE(bit_file_t *stream)
         if (stream->bitCount != 0)
         {
             (stream->bitBuffer) <<= 8 - (stream->bitCount);
+            #ifdef DEBUG
             printf("In BitFileToFILE: %x\n", stream->bitBuffer);
+            #endif
             store_output_data(stream->bitBuffer);
             fputc(stream->bitBuffer, stream->fp);   /* handle error? */
         }
@@ -603,7 +605,9 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     if (stream->bitCount == 0)
     {
         /* we can just put byte from file */
+        #ifdef DEBUG
         printf("In BitfilePutChar in if: %x\n", c);
+        #endif
         store_output_data(c);
         return fputc(c, stream->fp);
     }
@@ -611,7 +615,9 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     /* figure out what to write */
     tmp = ((unsigned char)c) >> (stream->bitCount);
     tmp = tmp | ((stream->bitBuffer) << (8 - stream->bitCount));
+    #ifdef DEBUG
     printf("In BitfilePutChar: %x\n", tmp);
+    #endif
     store_output_data(tmp);
     if (fputc(tmp, stream->fp) != EOF)
     {
@@ -628,7 +634,9 @@ int BitFilePutChar(const int c, bit_file_t *stream)
 
 int forwardTheCharVal(const int c)
 {
+    #ifdef DEBUG
     printf("In BitfilePutChar: %c\n", c);
+    #endif
     return c;
 }
 
@@ -952,7 +960,9 @@ int fromArrayGetChar(){
     
     if (output_data.current_position+7 >= output_data.number_of_ints)
     {
+        #ifdef DEBUG
         printf("Not enough bits left to read a char!\n");
+        #endif
         return -1;
     }
     
@@ -1024,7 +1034,9 @@ static int BitFileGetBitsLE(bit_file_t *stream, void *bits,
     {
         //returnValue = BitFileGetChar(stream);
         returnValue = fromArrayGetChar();
+        #ifdef DEBUG
         printf("BitFileGetChar returnValue:%i\n",returnValue);
+        #endif
         if (returnValue == EOF)
         {
             return EOF;
@@ -1042,7 +1054,9 @@ static int BitFileGetBitsLE(bit_file_t *stream, void *bits,
         {
             //returnValue = BitFileGetBit(stream);
             returnValue = fromArrayGetBit();
+            #ifdef DEBUG
             printf("BitFileGetBit returnValue:%i\n",returnValue);
+            #endif
             if (returnValue == EOF)
             {
                 return EOF;
