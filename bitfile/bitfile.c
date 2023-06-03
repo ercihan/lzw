@@ -208,6 +208,13 @@ static int BitFileNotSupported(bit_file_t *stream, void *bits,
 }
 
 void store_output_data(char c){
+    if(output_data.number_of_ints % OUTPUT_DATA_BUFFER_SIZE == (OUTPUT_DATA_BUFFER_SIZE-1)){
+        output_data.data.data_ascii = realloc(output_data.data.data_ascii,(output_data.number_of_ints + OUTPUT_DATA_BUFFER_SIZE)*sizeof(unsigned char));
+        if(output_data.data.data_ascii == NULL){
+            printf("ERROR allocating memory!");
+            return;
+        }
+    }
     output_data.data.data_ascii[output_data.number_of_ints] = c;
     output_data.number_of_ints += 1;
 }
