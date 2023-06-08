@@ -612,9 +612,9 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     if (stream->bitCount == 0)
     {
         /* we can just put byte from file */
-        #ifdef DEBUG
-        printf("In BitfilePutChar in if: %x\n", c);
-        #endif
+        // #ifdef DEBUG
+        // printf("In BitfilePutChar in if: %x\n", c);
+        // #endif
         store_output_data(c);
         //return fputc(c, stream->fp);
         return c;
@@ -623,9 +623,9 @@ int BitFilePutChar(const int c, bit_file_t *stream)
     /* figure out what to write */
     tmp = ((unsigned char)c) >> (stream->bitCount);
     tmp = tmp | ((stream->bitBuffer) << (8 - stream->bitCount));
-    #ifdef DEBUG
-    printf("In BitfilePutChar: %x\n", tmp);
-    #endif
+    // #ifdef DEBUG
+    // printf("In BitfilePutChar: %x\n", tmp);
+    // #endif
     
     store_output_data(tmp);
     //if (fputc(tmp, stream->fp) != EOF)
@@ -726,7 +726,7 @@ int BitFilePutBit(const int c, bit_file_t *stream)
     /* write bit buffer if we have 8 bits */
     if (stream->bitCount == 8)
     {
-        printf("In BitFilePutBit: %x\n", stream->bitBuffer);
+        // printf("In BitFilePutBit: %x\n", stream->bitBuffer);
         store_output_data(stream->bitBuffer);
         // if (fputc(stream->bitBuffer, stream->fp) == EOF)
         if(stream->bitBuffer == EOF)
